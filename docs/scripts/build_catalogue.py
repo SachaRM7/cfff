@@ -177,7 +177,15 @@ def main():
     if os.path.exists(tpl):
         page = open(tpl, encoding="utf-8").read()
         blob = json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
-        open(os.path.join(ROOT, "index.html"), "w", encoding="utf-8").write(page.replace("/*__DATA__*/null", blob))
+        page = page.replace("/*__DATA__*/null", blob)
+        head = ('<!doctype html>\n<html lang="fr">\n<head>\n<meta charset="utf-8">\n'
+                '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
+                '<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}'
+                'body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>\n')
+        # le <title>, les polices et le <style> de la page vont dans <head>, le reste dans <body>
+        split = page.index("</style>") + len("</style>")
+        doc = head + page[:split] + "\n</head>\n<body>\n" + page[split:] + "\n</body>\n</html>\n"
+        open(os.path.join(ROOT, "index.html"), "w", encoding="utf-8").write(doc)
     from collections import Counter
     c = Counter((x["r"], x["s"]) for x in prods)
     for k, n, subs in RAYONS:
