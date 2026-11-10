@@ -29,4 +29,4 @@ Nécessite Python 3 et Pillow (`pip install pillow`). Les données viennent de l
 
 ## Le code dans le QR
 
-Le lien du QR code se termine par `#c-…` (ou `#p-…` quand les prix sont affichés). Il contient la liste des produits cochés, le nom, le téléphone et les prix modifiés (`-x…`). La liste des produits est, codée selon leur position dans `catalogue.json` (triés par identifiant WooCommerce). Les nouveaux produits s'ajoutent à la fin, donc les cartes déjà imprimées restent valables tant qu'aucun produit n'est supprimé du site. Si des produits disparaissent, la mise à jour décale les positions : il faudra alors refaire les QR codes.
+Le lien du QR code se termine par `#c-…` (ou `#p-…` quand les prix sont affichés). Il contient la liste des produits cochés, le nom, le téléphone et les prix modifiés (`-x…`). La liste des produits est codée selon leur position dans `catalogue.json` (triés par identifiant WooCommerce). Les nouveaux produits s'ajoutent à la fin, donc les cartes déjà imprimées restent valables tant qu'aucun produit n'est supprimé du site. Si des produits disparaissent, la mise à jour décale les positions : il faudra alors refaire les QR codes.
