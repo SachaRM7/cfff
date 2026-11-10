@@ -63,7 +63,10 @@ button,input,select,textarea{font:inherit;color:inherit}
 .search svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted)}
 .tog{display:inline-flex;align-items:center;gap:7px;font-size:14px;color:var(--muted);cursor:pointer;user-select:none}
 .tog input{accent-color:var(--accent);width:16px;height:16px}
-.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:thin}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:thin;position:relative;scroll-padding-inline:24px;
+  --fl:0px;--fr:0px;-webkit-mask-image:linear-gradient(to right,transparent 0,#000 var(--fl),#000 calc(100% - var(--fr)),transparent 100%);mask-image:linear-gradient(to right,transparent 0,#000 var(--fl),#000 calc(100% - var(--fr)),transparent 100%)}
+.chips.more-l{--fl:36px}
+.chips.more-r{--fr:44px}
 .chip{flex:none;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:5px 12px;font-size:13.5px;cursor:pointer;display:inline-flex;gap:6px;align-items:baseline}
 .chip .n{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
 .chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
@@ -437,11 +440,25 @@ function buildChips(root, list, counts, onPick, current) {
   const mk = (k, label, n, dot) => {
     const b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.setAttribute("aria-pressed", String(current === k));
     b.innerHTML = (dot ? `<span class="dot"></span>` : "") + `${esc(label)} <span class="n">${n}</span>`;
-    b.addEventListener("click", () => onPick(k)); root.appendChild(b);
+    b.addEventListener("click", () => { root.dataset.center = "1"; onPick(k); }); root.appendChild(b);
   };
   mk("all", "Tous les rayons", counts.all);
   list.forEach(r => mk(r.k, r.name, counts[r.k], counts.dot && counts.dot[r.k]));
+  // après un clic : centrer la puce choisie pour faire apparaître les rayons voisins
+  if (root.dataset.center) {
+    delete root.dataset.center;
+    const on = root.querySelector('[aria-pressed="true"]');
+    if (on) root.scrollTo({left: on.offsetLeft - (root.clientWidth - on.offsetWidth) / 2, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"});
+  }
+  edgeHints(root);
 }
+function edgeHints(root) {
+  const max = root.scrollWidth - root.clientWidth;
+  root.classList.toggle("more-l", root.scrollLeft > 4);
+  root.classList.toggle("more-r", root.scrollLeft < max - 4);
+}
+document.querySelectorAll(".chips").forEach(c => c.addEventListener("scroll", () => edgeHints(c), {passive: true}));
+window.addEventListener("resize", () => document.querySelectorAll(".chips").forEach(edgeHints));
 function renderChips() {
   const counts = {all: sel.size ? `${sel.size}/${P.length}` : P.length, dot: {}};
   RAY.forEach(r => { const t = P.filter(p => p.r === r.k).length, n = P.filter(p => p.r === r.k && sel.has(p.i)).length; counts[r.k] = n ? `${n}/${t}` : t; counts.dot[r.k] = n > 0; });
