@@ -1,0 +1,641 @@
+<title>Catalogue Qayyim</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Reem+Kufi:wght@500;600;700&display=swap">
+<style>
+/* Layout: dark green masthead, sticky filter bar, rayon sections of compact checkable rows; step 2 = form + live card preview */
+:root{
+  --paper:#f3f5f1; --card:#ffffff; --ink:#15302b; --muted:#5a6a63; --line:#dbe2da;
+  --accent:#9c5f0c; --accent-soft:#f5e9d4; --sel:#e3eee5; --band:#15302b; --band-fg:#f1ece0; --band-muted:#b9c6bf;
+  --warn:#9b3a2a; --focus:#c98a24;
+  --f-display:"Reem Kufi","Trebuchet MS",system-ui,sans-serif;
+  --f-body:"Instrument Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0e1715; --card:#15211e; --ink:#e3eae5; --muted:#98a8a0; --line:#27362f;
+  --accent:#e3a650; --accent-soft:#2d2415; --sel:#1b2f29; --band:#091210; --band-fg:#efe8d8; --band-muted:#94a69d;
+  --warn:#e8806c; --focus:#e3a650; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0e1715; --card:#15211e; --ink:#e3eae5; --muted:#98a8a0; --line:#27362f;
+  --accent:#e3a650; --accent-soft:#2d2415; --sel:#1b2f29; --band:#091210; --band-fg:#efe8d8; --band-muted:#94a69d;
+  --warn:#e8806c; --focus:#e3a650; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{background:var(--paper)}
+body{color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+.wrap{max-width:1200px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-display);font-weight:600;text-wrap:balance;margin:0;letter-spacing:.005em}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:7px 14px;cursor:pointer;font-weight:500;font-size:14px;white-space:nowrap}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+:root[data-theme="dark"] .btn.primary{color:#1b1306}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.primary{color:#1b1306}}
+.btn.ghost{background:transparent}
+.btn.small{padding:4px 10px;font-size:13px}
+
+/* masthead */
+.mast{background:var(--band);color:var(--band-fg)}
+.mast .wrap{padding-block:26px 22px;display:flex;flex-wrap:wrap;gap:12px 28px;align-items:flex-end;justify-content:space-between}
+.mast h1{font-size:clamp(26px,4vw,38px);line-height:1.1}
+.mast p{margin:6px 0 0;color:var(--band-muted);max-width:62ch}
+.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--band-muted);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.star{width:14px;height:14px;flex:none}
+.steps{display:flex;gap:6px;background:rgba(255,255,255,.07);padding:4px;border-radius:999px}
+.steps button{border:0;background:transparent;color:var(--band-muted);padding:8px 16px;border-radius:999px;cursor:pointer;font-weight:600;font-size:14px}
+.steps button[aria-pressed="true"]{background:var(--band-fg);color:var(--band)}
+
+/* toolbar */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);border-bottom:1px solid var(--line)}
+.bar .wrap{padding-block:12px;display:flex;flex-direction:column;gap:10px}
+.row1{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.search{flex:1 1 260px;min-width:0;position:relative}
+.search input{width:100%;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:9px 14px 9px 38px}
+.search svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted)}
+.tog{display:inline-flex;align-items:center;gap:7px;font-size:14px;color:var(--muted);cursor:pointer;user-select:none}
+.tog input{accent-color:var(--accent);width:16px;height:16px}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:thin}
+.chip{flex:none;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:5px 12px;font-size:13.5px;cursor:pointer;display:inline-flex;gap:6px;align-items:baseline}
+.chip .n{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.chip[aria-pressed="true"] .n{color:inherit;opacity:.75}
+.chip .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);align-self:center}
+
+/* list */
+main.wrap{padding-block:18px 120px}
+.rayon{padding-block:14px 10px}
+.rhead{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;border-bottom:2px solid var(--ink);padding-bottom:8px;margin-bottom:6px}
+.rhead h2{font-size:24px}
+.rhead .count{color:var(--muted);font-size:13.5px;font-variant-numeric:tabular-nums}
+.rhead .btn{margin-left:auto}
+.sub{padding-block:12px 4px}
+.shead{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.shead h3{font-family:var(--f-body);font-size:13px;letter-spacing:.09em;text-transform:uppercase;font-weight:700;color:var(--muted)}
+.shead .count{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.shead .rule{flex:1;height:1px;background:var(--line)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,350px),1fr));gap:8px}
+.item{display:grid;grid-template-columns:20px 58px minmax(0,1fr) auto;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:8px 12px 8px 12px;cursor:pointer;transition:border-color .12s,background .12s}
+.item:hover{border-color:var(--muted)}
+.item:has(input:checked){background:var(--sel);border-color:var(--ink)}
+.item input{width:18px;height:18px;accent-color:var(--ink);margin:0;cursor:pointer}
+.thumb{width:58px;height:58px;border-radius:7px;background:#fff;object-fit:contain;border:1px solid var(--line)}
+.meta{min-width:0}
+.meta .nm{font-weight:600;font-size:14.5px;line-height:1.3;overflow-wrap:anywhere}
+.meta .op{font-size:12.5px;color:var(--muted);margin-top:2px;overflow-wrap:anywhere}
+.meta .tags{display:flex;gap:8px;align-items:center;margin-top:3px;font-size:12px}
+.meta a{color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--muted)}
+.meta a:hover{color:var(--ink)}
+.out{color:var(--warn);font-weight:600}
+.pr{font-variant-numeric:tabular-nums;font-weight:600;font-size:14px;text-align:right;white-space:nowrap}
+.pr small{display:block;font-weight:400;color:var(--muted);font-size:11px}
+.empty{padding:40px 0;text-align:center;color:var(--muted)}
+
+/* bottom bar */
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--band);color:var(--band-fg);padding-bottom:env(safe-area-inset-bottom,0px)}
+.dock .wrap{padding-block:11px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.dock .big{font-family:var(--f-display);font-size:22px;font-variant-numeric:tabular-nums}
+.dock .mini{color:var(--band-muted);font-size:13px;min-width:0;flex:1 1 180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dock .btn.ghost{color:var(--band-fg);border-color:rgba(255,255,255,.25)}
+
+/* step 2 */
+.two{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:28px;align-items:start;padding-block:24px 60px}
+@media (max-width:860px){.two{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:14px}
+.panel h2{font-size:20px}
+.fld{display:flex;flex-direction:column;gap:5px}
+.fld label{font-size:13px;font-weight:600}
+.fld .hint{font-size:12.5px;color:var(--muted)}
+.fld input[type=text],.fld input[type=tel],.fld input[type=url],textarea{width:100%;border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:9px 11px}
+.themes{display:flex;gap:8px;flex-wrap:wrap}
+.themes label{display:flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:999px;padding:5px 11px 5px 6px;cursor:pointer;font-size:13.5px}
+.themes input{position:absolute;opacity:0;pointer-events:none}
+.themes label:has(input:checked){border-color:var(--ink);background:var(--sel)}
+.themes .sw{width:20px;height:20px;border-radius:50%;border:1px solid var(--line)}
+.preview{display:flex;flex-direction:column;gap:16px;min-width:0}
+.cardimg{width:100%;max-width:640px;aspect-ratio:85/55;border-radius:12px;box-shadow:0 1px 2px rgba(0,0,0,.12),0 12px 32px rgba(10,30,25,.16);background:var(--card);display:block}
+.note{font-size:13px;color:var(--muted);max-width:62ch}
+.linkbox{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.linkbox code{flex:1 1 260px;min-width:0;overflow-wrap:anywhere;font-size:12.5px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px;user-select:all}
+.warnbox{border:1px solid var(--accent);background:var(--accent-soft);border-radius:10px;padding:10px 12px;font-size:13.5px}
+.sumlist{columns:2 260px;column-gap:28px;font-size:13.5px}
+.sumlist h4{font-family:var(--f-display);font-weight:600;font-size:16px;margin:10px 0 4px;break-after:avoid}
+.sumlist ul{margin:0 0 6px;padding-left:18px}
+.sumlist li{break-inside:avoid}
+details summary{cursor:pointer;font-weight:600;font-size:13.5px}
+textarea{min-height:140px;font-size:12.5px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+
+/* public view */
+.pub .mast .wrap{padding-block:34px 28px;flex-direction:column;align-items:flex-start;gap:6px}
+.pub .mast h1{font-size:clamp(30px,6vw,46px)}
+.pub .contact{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:8px;color:var(--band-fg);font-size:15px}
+.pub .contact span{user-select:all}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,190px),1fr));gap:14px}
+@media (max-width:520px){.pgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}}
+.pcard{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.pcard img{width:100%;aspect-ratio:1;object-fit:contain;background:#fff;padding:10px;display:block}
+.pcard .b{padding:10px 12px 12px;display:flex;flex-direction:column;gap:4px;flex:1}
+.pcard .nm{font-weight:600;font-size:14.5px;line-height:1.3;overflow-wrap:anywhere}
+.pcard .op{font-size:12.5px;color:var(--muted);overflow-wrap:anywhere}
+.pcard .pr{text-align:left;margin-top:auto;padding-top:4px;color:var(--accent)}
+.foot{padding-block:30px 40px;color:var(--muted);font-size:13px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;align-items:center}
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:8px 16px;border-radius:999px;font-size:14px;z-index:20;pointer-events:none}
+@media (max-width:520px){
+  .item{grid-template-columns:20px 48px minmax(0,1fr);row-gap:2px}
+  .thumb{width:48px;height:48px}
+  .item .pr{grid-column:3;text-align:left}
+  .item .pr small{display:inline;margin-left:6px}
+  .rhead .btn{margin-left:0}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="khatam" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="5" y="5" width="14" height="14"/><rect x="5" y="5" width="14" height="14" transform="rotate(45 12 12)"/></g></symbol>
+</svg>
+
+<!-- ============ OUTIL (sélection) ============ -->
+<div id="tool">
+  <header class="mast">
+    <div class="wrap">
+      <div>
+        <div class="eyebrow"><svg class="star"><use href="#khatam"/></svg>Catalogue Qayyim · <span id="total-n"></span> produits</div>
+        <h1>Choisissez les produits que vous vendez</h1>
+        <p>Cochez les articles de votre boutique. La carte de visite et son QR code se créent à partir de votre sélection.</p>
+      </div>
+      <nav class="steps" aria-label="Étapes">
+        <button type="button" id="tab-choose" aria-pressed="true">1 · Produits</button>
+        <button type="button" id="tab-card" aria-pressed="false">2 · Carte &amp; QR code</button>
+      </nav>
+    </div>
+  </header>
+
+  <section id="view-choose">
+    <div class="bar">
+      <div class="wrap">
+        <div class="row1">
+          <div class="search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <input id="q" type="search" placeholder="Rechercher : musc, coran, tasbih, miel…" aria-label="Rechercher un produit" autocomplete="off">
+          </div>
+          <label class="tog"><input type="checkbox" id="only-sel"> Ma sélection seulement</label>
+          <label class="tog"><input type="checkbox" id="hide-out"> Masquer les ruptures</label>
+        </div>
+        <div class="chips" id="chips" role="toolbar" aria-label="Rayons"></div>
+      </div>
+    </div>
+    <main class="wrap" id="list"></main>
+  </section>
+
+  <section id="view-card" hidden>
+    <div class="wrap two">
+      <form class="panel" id="card-form" autocomplete="off">
+        <h2>Infos de la carte</h2>
+        <div class="fld"><label for="f-name">Nom de la boutique</label><input type="text" id="f-name" maxlength="34" placeholder="Ex. Librairie Al-Nour"></div>
+        <div class="fld"><label for="f-tag">Accroche (facultatif)</label><input type="text" id="f-tag" maxlength="48" placeholder="Ex. Livres, musc &amp; produits naturels"><span class="hint">Vide : les rayons choisis s'affichent à la place.</span></div>
+        <div class="fld"><label for="f-phone">Téléphone</label><input type="tel" id="f-phone" maxlength="20" placeholder="06 12 34 56 78"></div>
+        <div class="fld"><label for="f-addr">Adresse</label><input type="text" id="f-addr" maxlength="60" placeholder="12 rue de la Paix, 75002 Paris"></div>
+        <div class="fld"><label for="f-web">Instagram, Snap ou site</label><input type="text" id="f-web" maxlength="40" placeholder="@ma.boutique"></div>
+        <div class="fld"><span style="font-size:13px;font-weight:600">Couleurs</span>
+          <div class="themes" id="themes"></div>
+        </div>
+        <label class="tog" style="color:var(--ink)"><input type="checkbox" id="f-prices"> Afficher les prix sur la page client</label>
+        <span class="hint" style="font-size:12.5px;color:var(--muted);margin-top:-8px">Ce sont les prix publics de qayyim.fr. Laissez décoché si vous pratiquez vos propres prix.</span>
+        <details>
+          <summary>Adresse de la page catalogue</summary>
+          <div class="fld" style="margin-top:8px"><input type="url" id="f-base" placeholder="https://…" aria-label="Adresse de la page catalogue"><span class="hint">Le QR code ouvre cette adresse suivie du code de votre sélection. Collez ici le lien public de cette page si vous l'avez partagée ou hébergée ailleurs.</span></div>
+        </details>
+      </form>
+
+      <div class="preview">
+        <div id="no-sel" class="warnbox" hidden>Aucun produit choisi pour l'instant. Revenez à l'étape 1 pour cocher vos produits.</div>
+        <img id="card-img" class="cardimg" alt="Aperçu de la carte de visite avec QR code">
+        <p class="note">Format carte de visite 85 × 55 mm, image haute définition. Pour l'enregistrer : clic droit ou appui long sur l'image, puis « Enregistrer l'image ».</p>
+        <div>
+          <div style="font-weight:600;font-size:13.5px;margin-bottom:6px">Lien du QR code</div>
+          <div class="linkbox"><code id="link"></code><button type="button" class="btn small" id="copy-link">Copier le lien</button><button type="button" class="btn small primary" id="open-public">Voir la page client</button></div>
+        </div>
+        <details>
+          <summary>QR code seul (pour une affiche, un sticker…)</summary>
+          <img id="qr-img" alt="QR code seul" style="width:200px;max-width:100%;margin-top:10px;border-radius:8px;border:1px solid var(--line)">
+        </details>
+        <div class="panel">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2 id="sum-title">Votre sélection</h2><button type="button" class="btn small" id="copy-list">Copier la liste (pour commander)</button></div>
+          <div class="sumlist" id="sumlist"></div>
+          <textarea id="list-text" readonly hidden aria-label="Liste des produits choisis"></textarea>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="dock" id="dock">
+    <div class="wrap">
+      <span class="big" id="dock-n">0</span><span style="font-size:14px">produits choisis</span>
+      <span class="mini" id="dock-mini"></span>
+      <button type="button" class="btn ghost small" id="clear">Tout décocher</button>
+      <button type="button" class="btn primary" id="go-card">Créer la carte →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PAGE CLIENT (ouverte par le QR code) ============ -->
+<div id="pub" class="pub" hidden>
+  <header class="mast">
+    <div class="wrap">
+      <div class="eyebrow"><svg class="star"><use href="#khatam"/></svg><span id="p-count"></span></div>
+      <h1 id="p-name">Nos produits</h1>
+      <p id="p-tag" style="margin:0"></p>
+      <div class="contact" id="p-contact"></div>
+    </div>
+  </header>
+  <div class="bar">
+    <div class="wrap">
+      <div class="row1"><div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="pq" type="search" placeholder="Rechercher un produit" aria-label="Rechercher un produit" autocomplete="off">
+      </div></div>
+      <div class="chips" id="pchips" role="toolbar" aria-label="Rayons"></div>
+    </div>
+  </div>
+  <main class="wrap" id="plist" style="padding-block:18px 10px"></main>
+  <div class="wrap foot"><span>Disponibilité et prix : renseignez-vous en boutique.</span><button type="button" class="btn small ghost" id="edit-sel">Modifier cette sélection</button></div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script>
+const DATA = /*__DATA__*/null;
+/* Lien public de la page (rempli après publication). Si la page est hébergée ailleurs, son adresse est utilisée automatiquement. */
+const BASE_URL = "https://claude.ai/artifact/DAVAyWonTXgCEN1GQphULF";
+
+const $ = s => document.querySelector(s);
+const P = DATA.products, RAY = DATA.rayons;
+const RNAME = Object.fromEntries(RAY.map(r => [r.k, r.name]));
+const norm = s => (s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const eur = n => n.toLocaleString("fr-FR", {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " €";
+const priceTxt = p => p.price == null ? "" : (p.priceMax && p.priceMax !== p.price ? "dès " + eur(p.price) : eur(p.price));
+const optsTxt = p => p.opts.map(o => (o.n === "Couleur" && o.v.length > 3 ? o.v.length + " couleurs" : o.n + " : " + o.v.join(", "))).join(" · ");
+P.forEach((p, i) => { p.i = i; p.key = norm([p.name, p.s, RNAME[p.r], p.opts.map(o => o.v.join(" ")).join(" "), p.siteCats.join(" ")].join(" ")); });
+const subOrder = {}; RAY.forEach(r => r.subs.forEach((s, j) => subOrder[r.k + "|" + s] = j));
+const sorted = (arr) => arr.slice().sort((a, b) => a.name.localeCompare(b.name, "fr", {sensitivity: "base"}));
+$("#total-n").textContent = P.length;
+
+/* ---------- stockage local (confort uniquement) ---------- */
+const store = {
+  get(k, d) { try { const v = localStorage.getItem("qayyim:" + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem("qayyim:" + k, JSON.stringify(v)); } catch (e) {} }
+};
+
+/* ---------- code de sélection : bits -> base 36 (lettres/chiffres seulement) ---------- */
+function encodeSel(set) { let b = 0n; for (const i of set) b |= 1n << BigInt(i); return b.toString(36); }
+function decodeSel(s) {
+  let b = 0n; for (const ch of s) b = b * 36n + BigInt(parseInt(ch, 36));
+  const out = new Set(); for (let i = 0; i < P.length; i++) if ((b >> BigInt(i)) & 1n) out.add(i); return out;
+}
+const toHex = s => Array.from(new TextEncoder().encode(s), x => x.toString(16).padStart(2, "0")).join("");
+const fromHex = h => { try { return new TextDecoder().decode(new Uint8Array(h.match(/../g).map(x => parseInt(x, 16)))); } catch (e) { return ""; } };
+function buildCode() {
+  if (!sel.size) return "";
+  let c = (form.prices ? "p-" : "c-") + encodeSel(sel);
+  if (form.name.trim()) c += "-n" + toHex(form.name.trim());
+  const tel = form.phone.replace(/[^\d+]/g, "").replace(/^\+/, "00");
+  if (tel) c += "-t" + tel;
+  return c;
+}
+function parseCode(h) {
+  const m = /^#([cp])-([0-9a-z]+)((?:-[nt][0-9a-z]*)*)$/.exec(h || "");
+  if (!m) return null;
+  const o = {prices: m[1] === "p", sel: decodeSel(m[2]), name: "", phone: ""};
+  for (const part of m[3].split("-").filter(Boolean)) {
+    if (part[0] === "n") o.name = fromHex(part.slice(1));
+    if (part[0] === "t") o.phone = part.slice(1).replace(/^00/, "+").replace(/^(0\d)(\d\d)(\d\d)(\d\d)(\d\d)$/, "$1 $2 $3 $4 $5");
+  }
+  return o;
+}
+
+/* ---------- état ---------- */
+let sel = new Set(store.get("sel", []).filter(i => i < P.length));
+const filt = {q: "", r: "all", onlySel: false, hideOut: false};
+const THEMES = {
+  vert: {label: "Vert & or", bg: "#15302b", fg: "#f3eee2", sub: "#b9c7c0", acc: "#d9a441"},
+  sable: {label: "Sable", bg: "#efe6d3", fg: "#1c2b27", sub: "#5c645c", acc: "#94600f"},
+  blanc: {label: "Blanc", bg: "#ffffff", fg: "#15302b", sub: "#5a6a63", acc: "#a8680f"},
+  nuit: {label: "Nuit", bg: "#141821", fg: "#f1eee6", sub: "#a4a9b6", acc: "#d6b26a"}
+};
+const form = Object.assign({name: "", tag: "", phone: "", addr: "", web: "", theme: "vert", prices: false, base: ""}, store.get("form", {}));
+
+/* ---------- vue sélection ---------- */
+const rows = [], groups = [], sections = [];
+function buildList() {
+  const root = $("#list"); root.innerHTML = "";
+  for (const r of RAY) {
+    const sec = document.createElement("section"); sec.className = "rayon"; sec.dataset.r = r.k;
+    const total = P.filter(p => p.r === r.k).length;
+    sec.innerHTML = `<div class="rhead"><h2>${esc(r.name)}</h2><span class="count"></span><button type="button" class="btn small" data-act="all-r">Tout le rayon</button></div>`;
+    const secObj = {el: sec, r: r.k, total, subs: []};
+    for (const s of r.subs) {
+      const items = sorted(P.filter(p => p.r === r.k && p.s === s)); if (!items.length) continue;
+      const sub = document.createElement("div"); sub.className = "sub";
+      sub.innerHTML = `<div class="shead"><h3>${esc(s)}</h3><span class="count"></span><span class="rule"></span><button type="button" class="btn small ghost" data-act="all-s">Tout cocher</button></div><div class="grid"></div>`;
+      const grid = sub.querySelector(".grid");
+      const g = {el: sub, items, btn: sub.querySelector("[data-act]"), count: sub.querySelector(".count")};
+      for (const p of items) {
+        const lab = document.createElement("label"); lab.className = "item"; lab.dataset.i = p.i;
+        const ot = optsTxt(p);
+        lab.innerHTML = `<input type="checkbox" value="${p.i}" aria-label="${esc(p.name)}">` +
+          (p.img ? `<img class="thumb" loading="lazy" src="${p.img}" alt="">` : `<span class="thumb"></span>`) +
+          `<span class="meta"><span class="nm">${esc(p.name)}</span>${ot ? `<div class="op">${esc(ot)}</div>` : ""}` +
+          `<span class="tags">${p.stock ? "" : `<span class="out">Rupture sur le site</span>`}<a href="${esc(p.url)}" target="_blank" rel="noopener">Fiche ↗</a></span></span>` +
+          `<span class="pr">${priceTxt(p) || "—"}<small>prix public</small></span>`;
+        grid.appendChild(lab);
+        rows.push({el: lab, p, cb: lab.querySelector("input")});
+      }
+      g.btn.addEventListener("click", () => toggleMany(visibleIn(g.items)));
+      sec.appendChild(sub); secObj.subs.push(g); groups.push(g);
+    }
+    sec.querySelector("[data-act=all-r]").addEventListener("click", () => toggleMany(visibleIn(P.filter(p => p.r === r.k))));
+    secObj.count = sec.querySelector(".rhead .count"); secObj.btn = sec.querySelector("[data-act=all-r]");
+    root.appendChild(sec); sections.push(secObj);
+  }
+  const empty = document.createElement("p"); empty.className = "empty"; empty.id = "empty"; empty.hidden = true;
+  empty.textContent = "Aucun produit ne correspond. Essayez un autre mot ou un autre rayon.";
+  root.appendChild(empty);
+  root.addEventListener("change", e => {
+    if (e.target.matches("input[type=checkbox]")) { const i = +e.target.value; e.target.checked ? sel.add(i) : sel.delete(i); update(); }
+  });
+}
+const matches = p => (!filt.q || filt.q.split(/\s+/).every(w => p.key.includes(w))) && (filt.r === "all" || p.r === filt.r) &&
+  (!filt.hideOut || p.stock) && (!filt.onlySel || sel.has(p.i));
+const visibleIn = items => items.filter(matches);
+function toggleMany(items) {
+  if (!items.length) return;
+  const allOn = items.every(p => sel.has(p.i));
+  items.forEach(p => allOn ? sel.delete(p.i) : sel.add(p.i));
+  update(); if (filt.onlySel) applyFilters();
+}
+function applyFilters() {
+  let any = false;
+  for (const row of rows) row.el.hidden = !matches(row.p);
+  for (const s of sections) {
+    let secVis = false;
+    for (const g of s.subs) { const v = g.items.some(matches); g.el.hidden = !v; secVis = secVis || v; }
+    s.el.hidden = !secVis; any = any || secVis;
+  }
+  $("#empty").hidden = any;
+  updateButtons();
+}
+function updateButtons() {
+  for (const g of groups) {
+    const vis = visibleIn(g.items);
+    g.btn.textContent = vis.length && vis.every(p => sel.has(p.i)) ? "Tout décocher" : "Tout cocher";
+    g.count.textContent = g.items.filter(p => sel.has(p.i)).length + " / " + g.items.length;
+  }
+  for (const s of sections) {
+    const all = P.filter(p => p.r === s.r), vis = visibleIn(all), n = all.filter(p => sel.has(p.i)).length;
+    s.count.textContent = n ? `${n} choisi${n > 1 ? "s" : ""} sur ${s.total}` : `${s.total} produits`;
+    s.btn.textContent = vis.length && vis.every(p => sel.has(p.i)) ? "Décocher le rayon" : "Tout le rayon";
+  }
+}
+function buildChips(root, list, counts, onPick, current) {
+  root.innerHTML = "";
+  const mk = (k, label, n, dot) => {
+    const b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.setAttribute("aria-pressed", String(current === k));
+    b.innerHTML = (dot ? `<span class="dot"></span>` : "") + `${esc(label)} <span class="n">${n}</span>`;
+    b.addEventListener("click", () => onPick(k)); root.appendChild(b);
+  };
+  mk("all", "Tous les rayons", counts.all);
+  list.forEach(r => mk(r.k, r.name, counts[r.k], counts.dot && counts.dot[r.k]));
+}
+function renderChips() {
+  const counts = {all: sel.size ? `${sel.size}/${P.length}` : P.length, dot: {}};
+  RAY.forEach(r => { const t = P.filter(p => p.r === r.k).length, n = P.filter(p => p.r === r.k && sel.has(p.i)).length; counts[r.k] = n ? `${n}/${t}` : t; counts.dot[r.k] = n > 0; });
+  buildChips($("#chips"), RAY, counts, k => { filt.r = k; renderChips(); applyFilters(); window.scrollTo({top: 0}); }, filt.r);
+}
+function update() {
+  store.set("sel", [...sel]);
+  for (const row of rows) row.cb.checked = sel.has(row.p.i);
+  renderChips(); updateButtons();
+  $("#dock-n").textContent = sel.size;
+  const by = RAY.map(r => [r.name, P.filter(p => p.r === r.k && sel.has(p.i)).length]).filter(x => x[1]);
+  $("#dock-mini").textContent = by.map(x => `${x[0]} ${x[1]}`).join(" · ");
+  if (!$("#view-card").hidden) renderCard();
+}
+
+/* ---------- vue carte ---------- */
+function buildForm() {
+  const th = $("#themes");
+  th.innerHTML = Object.entries(THEMES).map(([k, t]) => `<label><input type="radio" name="theme" id="th-${k}" value="${k}"><span class="sw" style="background:${t.bg};box-shadow:inset -7px 0 0 ${t.acc}"></span>${t.label}</label>`).join("");
+  for (const k of ["name", "tag", "phone", "addr", "web", "base"]) {
+    const el = $("#f-" + k); el.value = form[k] || "";
+    el.addEventListener("input", () => { form[k] = el.value; store.set("form", form); schedule(); });
+  }
+  $("#f-base").placeholder = defaultBase() || "https://…";
+  $("#f-prices").checked = !!form.prices;
+  $("#f-prices").addEventListener("change", e => { form.prices = e.target.checked; store.set("form", form); schedule(); });
+  (th.querySelector(`input[value="${form.theme}"]`) || th.querySelector("input")).checked = true;
+  th.addEventListener("change", e => { form.theme = e.target.value; store.set("form", form); schedule(); });
+  $("#card-form").addEventListener("submit", e => e.preventDefault());
+}
+const inFrame = (() => { try { return window.top !== window.self; } catch (e) { return true; } })();
+function defaultBase() {
+  if (BASE_URL && (inFrame || !/^https?:/.test(location.protocol))) return BASE_URL;
+  return /^https?:/.test(location.protocol) ? location.href.split("#")[0] : BASE_URL;
+}
+const pageLink = () => { const b = (form.base || "").trim().split("#")[0] || defaultBase(); const c = buildCode(); return b && c ? b + "#" + c : ""; };
+let tmr; function schedule() { clearTimeout(tmr); tmr = setTimeout(renderCard, 120); }
+
+function wrapLines(ctx, text, maxW, maxLines) {
+  const words = text.split(/\s+/), lines = []; let cur = "";
+  for (const w of words) {
+    const t = cur ? cur + " " + w : w;
+    if (ctx.measureText(t).width <= maxW) cur = t; else { if (cur) lines.push(cur); cur = w; }
+  }
+  if (cur) lines.push(cur);
+  if (lines.length > maxLines) { lines.length = maxLines; let l = lines[maxLines - 1]; while (ctx.measureText(l + "…").width > maxW && l.length) l = l.slice(0, -1); lines[maxLines - 1] = l.trimEnd() + "…"; }
+  return lines;
+}
+function drawStar(ctx, cx, cy, r, color, lw) {
+  ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.lineJoin = "round";
+  for (const a of [0, Math.PI / 4]) { ctx.save(); ctx.translate(cx, cy); ctx.rotate(a); ctx.strokeRect(-r, -r, 2 * r, 2 * r); ctx.restore(); }
+  ctx.restore();
+}
+function drawQR(ctx, text, x, y, size, fg) {
+  const qr = qrcode(0, "M"); qr.addData(text); qr.make();
+  const n = qr.getModuleCount(), q = 2, cell = size / (n + 2 * q);
+  ctx.fillStyle = "#ffffff"; ctx.fillRect(x, y, size, size);
+  ctx.fillStyle = fg;
+  for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (qr.isDark(r, c))
+    ctx.fillRect(Math.floor(x + (c + q) * cell), Math.floor(y + (r + q) * cell), Math.ceil(cell), Math.ceil(cell));
+}
+function roundRect(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+
+let fontsReady = null;
+function loadFonts() {
+  if (!fontsReady) fontsReady = Promise.all(['600 60px "Reem Kufi"', '500 26px "Instrument Sans"', '700 30px "Instrument Sans"', '400 22px "Instrument Sans"']
+    .map(f => document.fonts ? document.fonts.load(f).catch(() => {}) : null)).catch(() => {});
+  return fontsReady;
+}
+async function renderCard() {
+  await loadFonts();
+  const link = pageLink();
+  $("#no-sel").hidden = sel.size > 0;
+  $("#link").textContent = link || "Choisissez des produits pour générer le lien.";
+  const W = 1020, H = 660, pad = 58, t = THEMES[form.theme] || THEMES.vert;
+  const cv = document.createElement("canvas"); cv.width = W; cv.height = H; const ctx = cv.getContext("2d");
+  ctx.fillStyle = t.bg; ctx.fillRect(0, 0, W, H);
+  if (t.bg === "#ffffff") { ctx.strokeStyle = "#dfe3dc"; ctx.lineWidth = 2; ctx.strokeRect(1, 1, W - 2, H - 2); }
+  // motif discret : grande étoile à 8 branches qui déborde en bas à droite
+  ctx.globalAlpha = .09; drawStar(ctx, W - 120, H + 10, 190, t.acc, 3); drawStar(ctx, W - 120, H + 10, 140, t.acc, 2); ctx.globalAlpha = 1;
+  const qrS = 290, qx = W - pad - qrS, qy = 70;
+  const textW = qx - pad - 44;
+  // emblème + nom
+  drawStar(ctx, pad + 15, pad + 15, 11, t.acc, 3);
+  const name = form.name.trim() || "Votre boutique";
+  let fs = 64; ctx.font = `600 ${fs}px "Reem Kufi", "Trebuchet MS", sans-serif`;
+  while (ctx.measureText(name).width > textW && fs > 34) { fs -= 2; ctx.font = `600 ${fs}px "Reem Kufi", "Trebuchet MS", sans-serif`; }
+  ctx.fillStyle = form.name.trim() ? t.fg : t.sub; ctx.textBaseline = "alphabetic";
+  const nameLines = ctx.measureText(name).width > textW ? wrapLines(ctx, name, textW, 2) : [name];
+  let y = pad + 46 + fs * 0.95;
+  nameLines.forEach((l, k) => ctx.fillText(l, pad, y + k * fs * 1.05)); y += (nameLines.length - 1) * fs * 1.05;
+  // accroche ou rayons
+  const ray = RAY.map(r => [r.name, P.filter(p => p.r === r.k && sel.has(p.i)).length]).filter(x => x[1]).sort((a, b) => b[1] - a[1]).map(x => x[0]);
+  const tag = form.tag.trim() || ray.join(" · ") || "Livres, musc & produits naturels";
+  ctx.font = '500 27px "Instrument Sans", system-ui, sans-serif'; ctx.fillStyle = t.acc;
+  const tagLines = wrapLines(ctx, tag, textW, 3); y += 48;
+  tagLines.forEach((l, k) => ctx.fillText(l, pad, y + k * 36));
+  // coordonnées en bas
+  const contact = [];
+  if (form.phone.trim()) contact.push(["700 32px", form.phone.trim(), t.fg]);
+  if (form.addr.trim()) contact.push(["400 23px", form.addr.trim(), t.sub]);
+  if (form.web.trim()) contact.push(["500 23px", form.web.trim(), t.sub]);
+  if (!contact.length) contact.push(["400 23px", "Téléphone · adresse · réseaux", t.sub]);
+  let cy = H - pad;
+  for (const [f, txt, col] of contact.reverse()) {
+    ctx.font = `${f} "Instrument Sans", system-ui, sans-serif`; ctx.fillStyle = col;
+    const lines = wrapLines(ctx, txt, textW, 2).reverse();
+    for (const l of lines) { ctx.fillText(l, pad, cy); cy -= f.startsWith("700") ? 44 : 33; }
+  }
+  // QR
+  ctx.save(); roundRect(ctx, qx - 8, qy - 8, qrS + 16, qrS + 16, 18); ctx.fillStyle = "#ffffff"; ctx.fill(); ctx.restore();
+  if (link) drawQR(ctx, link, qx, qy, qrS, "#13201d");
+  else { ctx.fillStyle = "#e9ece8"; ctx.fillRect(qx, qy, qrS, qrS); ctx.fillStyle = "#6b7570"; ctx.font = '500 22px "Instrument Sans", sans-serif'; ctx.textAlign = "center"; ctx.fillText("QR code", qx + qrS / 2, qy + qrS / 2 + 8); ctx.textAlign = "left"; }
+  ctx.textAlign = "center"; ctx.fillStyle = t.fg; ctx.font = '700 23px "Instrument Sans", system-ui, sans-serif';
+  ctx.fillText("Scannez pour voir", qx + qrS / 2, qy + qrS + 52);
+  ctx.fillStyle = t.sub; ctx.font = '400 21px "Instrument Sans", system-ui, sans-serif';
+  ctx.fillText(sel.size ? `nos ${sel.size} produits` : "nos produits", qx + qrS / 2, qy + qrS + 80);
+  ctx.textAlign = "left";
+  $("#card-img").src = cv.toDataURL("image/png");
+  // QR seul
+  if (link) { const c2 = document.createElement("canvas"); c2.width = c2.height = 720; drawQR(c2.getContext("2d"), link, 0, 0, 720, "#13201d"); $("#qr-img").src = c2.toDataURL("image/png"); }
+  renderSummary();
+}
+function listText() {
+  const out = [`${form.name.trim() || "Ma sélection"} — ${sel.size} produits (catalogue Qayyim)`, ""];
+  for (const r of RAY) {
+    const items = P.filter(p => p.r === r.k && sel.has(p.i)); if (!items.length) continue;
+    out.push(r.name.toUpperCase());
+    for (const s of r.subs) {
+      const it = sorted(items.filter(p => p.s === s)); if (!it.length) continue;
+      out.push("  " + s);
+      it.forEach(p => out.push(`   - ${p.name}${p.opts.length ? " [" + p.opts.map(o => o.n + " : " + o.v.join(", ")).join(" ; ") + "]" : ""}${p.price != null ? " — " + priceTxt(p) : ""}${p.sku ? " (réf. " + p.sku + ")" : ""}`));
+    }
+    out.push("");
+  }
+  return out.join("\n");
+}
+function renderSummary() {
+  $("#sum-title").textContent = sel.size ? `Votre sélection · ${sel.size} produits` : "Votre sélection";
+  let h = "";
+  for (const r of RAY) {
+    const items = sorted(P.filter(p => p.r === r.k && sel.has(p.i))); if (!items.length) continue;
+    h += `<div><h4>${esc(r.name)} <span style="font-family:var(--f-body);font-size:13px;color:var(--muted);font-weight:400">${items.length}</span></h4><ul>${items.map(p => `<li>${esc(p.name)}</li>`).join("")}</ul></div>`;
+  }
+  $("#sumlist").innerHTML = h || `<p class="note">Rien pour l'instant.</p>`;
+}
+
+/* ---------- page client ---------- */
+let pubState = null; const pf = {q: "", r: "all"};
+function showPublic(o) {
+  pubState = o;
+  $("#tool").hidden = true; $("#pub").hidden = false;
+  document.title = (o.name || "Nos produits") + " · Catalogue";
+  $("#p-name").textContent = o.name || "Nos produits";
+  $("#p-count").textContent = `${o.sel.size} produits disponibles`;
+  const rs = RAY.filter(r => P.some(p => p.r === r.k && o.sel.has(p.i)));
+  $("#p-tag").textContent = rs.map(r => r.name).join(" · ");
+  $("#p-contact").innerHTML = o.phone ? `<span>☎ ${esc(o.phone)}</span>` : "";
+  pf.q = ""; pf.r = "all"; $("#pq").value = "";
+  renderPublic();
+}
+function renderPublic() {
+  const o = pubState, rs = RAY.filter(r => P.some(p => p.r === r.k && o.sel.has(p.i)));
+  const counts = {all: o.sel.size}; rs.forEach(r => counts[r.k] = P.filter(p => p.r === r.k && o.sel.has(p.i)).length);
+  buildChips($("#pchips"), rs, counts, k => { pf.r = k; renderPublic(); }, pf.r);
+  $("#pchips").hidden = rs.length < 2;
+  const q = norm(pf.q.trim());
+  let h = "";
+  for (const r of rs) {
+    if (pf.r !== "all" && pf.r !== r.k) continue;
+    const items = P.filter(p => p.r === r.k && o.sel.has(p.i) && (!q || q.split(/\s+/).every(w => p.key.includes(w))))
+      .sort((a, b) => (subOrder[a.r + "|" + a.s] - subOrder[b.r + "|" + b.s]) || a.name.localeCompare(b.name, "fr", {sensitivity: "base"}));
+    if (!items.length) continue;
+    h += `<section class="rayon"><div class="rhead"><h2>${esc(r.name)}</h2><span class="count">${items.length}</span></div><div class="pgrid" style="margin-top:12px">` +
+      items.map(p => { const ot = optsTxt(p); return `<article class="pcard">${p.img ? `<img loading="lazy" src="${p.img}" alt="">` : ""}<div class="b"><span class="op">${esc(p.s)}</span><span class="nm">${esc(p.name)}</span>${ot ? `<span class="op">${esc(ot)}</span>` : ""}${o.prices && p.price != null ? `<span class="pr">${priceTxt(p)}</span>` : ""}</div></article>`; }).join("") +
+      `</div></section>`;
+  }
+  $("#plist").innerHTML = h || `<p class="empty">Aucun produit ne correspond à « ${esc(pf.q)} ».</p>`;
+}
+$("#pq").addEventListener("input", e => { pf.q = e.target.value; renderPublic(); });
+$("#edit-sel").addEventListener("click", () => {
+  if (pubState) { sel = new Set(pubState.sel); if (pubState.name) form.name = pubState.name; form.prices = pubState.prices; store.set("form", form); store.set("sel", [...sel]); }
+  location.hash = "choisir";
+});
+
+/* ---------- navigation ---------- */
+function setStep(card) {
+  $("#view-choose").hidden = card; $("#view-card").hidden = !card;
+  $("#tab-choose").setAttribute("aria-pressed", String(!card)); $("#tab-card").setAttribute("aria-pressed", String(card));
+  $("#go-card").hidden = card; $("#clear").hidden = card;
+  if (card) renderCard();
+  window.scrollTo({top: 0});
+}
+function showTool() {
+  $("#pub").hidden = true; $("#tool").hidden = false; document.title = "Catalogue Qayyim";
+  for (const k of ["name", "tag", "phone", "addr", "web", "base"]) { const el = $("#f-" + k); if (el && el.value !== (form[k] || "")) el.value = form[k] || ""; }
+  $("#f-prices").checked = !!form.prices;
+  update(); applyFilters();
+}
+function route() { const o = parseCode(location.hash); if (o) showPublic(o); else showTool(); }
+
+let toastT; function toast(msg) { const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, 2200); }
+async function copy(text, fallbackEl, okMsg) {
+  try { await navigator.clipboard.writeText(text); toast(okMsg); }
+  catch (e) {
+    if (fallbackEl) { fallbackEl.hidden = false; if ("value" in fallbackEl) { fallbackEl.value = text; fallbackEl.select(); } else { const r = document.createRange(); r.selectNodeContents(fallbackEl); const s = getSelection(); s.removeAllRanges(); s.addRange(r); } }
+    toast("Copie bloquée : le texte est sélectionné, faites Ctrl+C");
+  }
+}
+
+buildList(); buildForm();
+$("#q").addEventListener("input", e => { filt.q = norm(e.target.value.trim()); applyFilters(); });
+$("#only-sel").addEventListener("change", e => { filt.onlySel = e.target.checked; applyFilters(); });
+$("#hide-out").addEventListener("change", e => { filt.hideOut = e.target.checked; applyFilters(); });
+$("#tab-choose").addEventListener("click", () => setStep(false));
+$("#tab-card").addEventListener("click", () => setStep(true));
+$("#go-card").addEventListener("click", () => setStep(true));
+$("#clear").addEventListener("click", () => {
+  const b = $("#clear");
+  if (b.dataset.confirm) { sel.clear(); update(); applyFilters(); b.textContent = "Tout décocher"; delete b.dataset.confirm; return; }
+  if (!sel.size) return;
+  b.dataset.confirm = "1"; b.textContent = "Confirmer ?"; setTimeout(() => { b.textContent = "Tout décocher"; delete b.dataset.confirm; }, 3000);
+});
+$("#copy-link").addEventListener("click", () => { const l = pageLink(); if (l) copy(l, $("#link"), "Lien copié"); });
+$("#open-public").addEventListener("click", () => { const c = buildCode(); if (c) location.hash = c; });
+$("#copy-list").addEventListener("click", () => { if (sel.size) copy(listText(), $("#list-text"), "Liste copiée"); });
+window.addEventListener("hashchange", route);
+route();
+</script>
